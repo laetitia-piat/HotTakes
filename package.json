@@ -19,6 +19,6 @@
   "homepage": "https://github.com/laetitia-piat/HotTakes#readme",
   "dependencies": {
     "express": "^4.18.2",
-    "mongoose": "^6.9.0"
+    "mongoose": "^6.9.2"
   }
 }

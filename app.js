@@ -1,14 +1,16 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const app = express();
-const saucesRoutes = require('./routes/sauce');
 
-mongoose.connect('mongodb+srv://laetitia:laetitia@atlascluster.iuepoez.mongodb.net/?retryWrites=true&w=majority',
+const saucesRoutes = require('./routes/sauce');
+const userRoutes = require('./routes/user')
+
+mongoose.connect('mongodb+srv://laetitia:Vingt100@atlascluster.iuepoez.mongodb.net/?retryWrites=true&w=majority',
   {useNewUrlParser: true,
   useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
+const app = express();
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -19,6 +21,7 @@ app.use((req, res, next) => {
   });
 
 
-app.use('/api', saucesRoutes);
+app.use('/api/sauce', saucesRoutes);
+app.use('/api/auth', userRoutes);
 
 module.exports = app;
