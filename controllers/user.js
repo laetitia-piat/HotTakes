@@ -1,8 +1,11 @@
+//Installation du package BCRYPT afin de crypter le MDP dans la BDD sous forme d'un HASH
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+//Chemin d'accès aux schémas mongoose
 const User = require('../models/User');
 
+//Création de la route pour l'enregistrement des données d'authentification sur la BDD
 exports.signup = (req, res, next) => {
     bcrypt.hash(req.body.password, 10)
       .then(hash => {
@@ -17,6 +20,7 @@ exports.signup = (req, res, next) => {
       .catch(error => res.status(500).json({ error }));
   };
 
+// Création de la route pour s'authentifier et vérifier les éléments créés lors du SIGNUP + Verif du MDP Hashé
 exports.login = (req, res, next) => {
    User.findOne({ email: req.body.email })
        .then(user => {

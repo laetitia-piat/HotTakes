@@ -1,6 +1,9 @@
+//Chemin d'accès aux schémas mongoose
 const Sauce = require('../models/Sauce');
+//Installation du package FS qui permet d'accéder aux fichiers afin de modifier ou supprimer
 const fs = require('fs');
 
+//Création de la route pour creer une sauce
 exports.createSauce = (req, res, next) => {
     const sauceObject = JSON.parse(req.body.sauce);
     delete sauceObject._id;
@@ -14,7 +17,7 @@ exports.createSauce = (req, res, next) => {
       .then(() => res.status(201).json({ message: 'Sauce enregistrée !'}))
       .catch(error => res.status(400).json({ error }));
 };
-
+//Création de la route pour modifier une sauce uniquement pour l'utilisateur l'ayant créé
 exports.modifySauce = (req, res, next) => {
    const sauceObject = req.file ? {
        ...JSON.parse(req.body.sauce),
@@ -37,12 +40,27 @@ exports.modifySauce = (req, res, next) => {
        });
 };
 
-exports.deleteSauce = (req,res,next) => {
-    Sauce.deleteOne({ _id: req.params.id })
-    .then(() => res.status(200).json({ message: 'Sauce supprimée !'}))
-    .catch(error => res.status(400).json({ error }));
-};
+//Création de la route pour supprimer une sauce uniquement pour l'utilisateur l'ayant créé grace au package FS
+exports.deleteSauce = (req, res, next) => {
+    Sauce.findOne({ _id: req.params.id})
+        .then(sauce => {
+            if (sauce.userId != req.auth.userId) {
+                res.status(401).json({message: 'Not authorized'});
+            } else {
+                const filename = sauce.imageUrl.split('/images/')[1];
+                fs.unlink(`images/${filename}`, () => {
+                    Sauce.deleteOne({_id: req.params.id})
+                        .then(() => { res.status(200).json({message: 'Sauce supprimée !'})})
+                        .catch(error => res.status(401).json({ error }));
+                });
+            }
+        })
+        .catch( error => {
+            res.status(500).json({ error });
+        });
+ };
 
+//Création de la route pour aimer ou ne pas aimer la sauce mais également pour changer l'avis et ne plus aimer ou inversement
 exports.likeSauce = (req, res, next) => {    
     const like = req.body.like;
     if(like === 1) { // Option like
@@ -72,12 +90,14 @@ exports.likeSauce = (req, res, next) => {
     }   
 };
 
+//Création de la route pour afficher tableau de toute les sauces
 exports.getAllSauce = (req,res,next) => {
     Sauce.find()
     .then(sauces => res.status(200).json(sauces))
     .catch(error => res.status(400).json({ error }));
 };
 
+//Création de la route pour afficher tableau d'une sauce
 exports.getOneSauce = (req,res,next) => {
     Sauce.findOne({ _id: req.params.id })
     .then(sauce => res.status(200).json(sauce))

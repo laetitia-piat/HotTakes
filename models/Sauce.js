@@ -1,5 +1,7 @@
+//Installation du package MONGOOSE pour notre BDD
 const mongoose = require('mongoose');
 
+//Création du schéma mongoose
 const sauceSchema = mongoose.Schema({
   userId: {type: String, required: true},
   name: { type: String, required: true },
@@ -14,4 +16,5 @@ const sauceSchema = mongoose.Schema({
   usersDisliked: { type: ["String"]},
 });
 
+//Export pour l'utiliser dans les autres fichiers de notre Back End
 module.exports = mongoose.model('Sauce', sauceSchema);
